@@ -2,7 +2,7 @@ package Interfaces;
 
 public interface CanUpdate {
 	/**
-	 * ÔÚ´Ëº¯ÊıÀï¸üĞÂ£¬¸üĞÂĞèÊµÏÖ¸Ã½Ó¿Ú
+	 * æ¯å¸§è°ƒç”¨æ­¤å‡½æ•°
 	 */
-	void update();
+	void update(long deltaMillisecond);
 }
