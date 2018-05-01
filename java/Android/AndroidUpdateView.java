@@ -3,11 +3,14 @@ package Android;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.util.Log;
+import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import java.util.ArrayList;
 
 import Interfaces.CanUpdate;
+import Interfaces.UpdateView;
 
 public class AndroidUpdateView extends SurfaceView implements Runnable{
     private AndroidMain androidMain;
@@ -19,19 +22,22 @@ public class AndroidUpdateView extends SurfaceView implements Runnable{
     private final long updateInMillis = 12;
     private Thread updateThread;
     private ArrayList<CanUpdate> updateList;
+    private ArrayList<UpdateView> updateViewList;
+    private SurfaceHolder holder;
 
     public AndroidUpdateView(Context context) {
         super(context);
         bitmap=Bitmap.createBitmap(targetWidth,targetHeight, Bitmap.Config.RGB_565);
-        canvas=new Canvas(bitmap);
         updateList=new ArrayList<>(5);
+        updateViewList=new ArrayList<>(2);
+        holder=getHolder();
     }
 
     public void resume()
     {
         isRun=true;
         this.updateThread=new Thread(this);
-        updateThread.run();
+        updateThread.start();
     }
 
     @Override
@@ -40,6 +46,7 @@ public class AndroidUpdateView extends SurfaceView implements Runnable{
         long deltaTime;
         while(isRun)
         {
+            if(!holder.getSurface().isValid()) continue;
             deltaTime = System.currentTimeMillis()-startTime;
             if(deltaTime<updateInMillis)
             {
@@ -50,11 +57,17 @@ public class AndroidUpdateView extends SurfaceView implements Runnable{
                 }
             }
 
-            for(CanUpdate o:updateList)
-            {
-                o.update(System.currentTimeMillis()-startTime);
+            /*更新游戏逻辑*/
+            for(CanUpdate o:updateList) {
+                o.update(System.currentTimeMillis() - startTime);
             }
-            draw(canvas);
+
+            /*更新游戏视图*/
+            canvas=holder.lockCanvas();
+            for(UpdateView u:updateViewList){
+                u.updateView(canvas);
+            }
+            holder.unlockCanvasAndPost(canvas);
 
             startTime=System.currentTimeMillis();
         }
@@ -65,6 +78,20 @@ public class AndroidUpdateView extends SurfaceView implements Runnable{
         isRun=false;
     }
 
+    public void stop()
+    {
+        isRun=false;
+        while(true)
+        {
+            try{
+                updateThread.join();
+            }catch(InterruptedException e)
+            {
+
+            }
+        }
+    }
+
     public void addToUpdateList(CanUpdate o)
     {
         updateList.add(o);
@@ -73,5 +100,15 @@ public class AndroidUpdateView extends SurfaceView implements Runnable{
     public void removeFromUpdateList(CanUpdate o)
     {
         updateList.remove(o);
+    }
+
+    public void addToUpdateViewList(UpdateView updateView)
+    {
+        updateViewList.add(updateView);
+    }
+
+    public void removeFromUpdateViewList(UpdateView updateView)
+    {
+        updateViewList.remove(updateView);
     }
 }

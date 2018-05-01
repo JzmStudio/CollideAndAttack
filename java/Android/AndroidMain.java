@@ -2,22 +2,35 @@ package Android;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.example.collideandattack.R;
+
+import java.util.ArrayList;
+import java.util.zip.Inflater;
+
+import Interfaces.OnBackPressed;
 
 
 public class AndroidMain extends Activity {
     private Bitmap screenBitmap;
     private int screenWidth;
     private int screenHeight;
-    private ViewGroup viewGroup;
+    private RelativeLayout layout;
     private AndroidUpdateView updateView;
     private AndroidStorage storage;
+    private ArrayList<OnBackPressed> pressList; //返回键按下时的回调队列
+
+    public AndroidGraphics graphics;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,19 +41,17 @@ public class AndroidMain extends Activity {
         screenWidth = metric.widthPixels;
         screenHeight = metric.heightPixels;
 
+        /*各功能初始化*/
         storage=new AndroidStorage(this);
+        graphics=new AndroidGraphics(this);
+        pressList=new ArrayList<>(2);
 
+        setContentView(R.layout.main_layout);
         updateView=new AndroidUpdateView(this);
-        //viewGroup = (ViewGroup) findViewById(R.layout.viewgroup);
-        viewGroup= (ViewGroup)LayoutInflater.from(this).inflate(R.layout.viewgroup,null);
-        if(viewGroup==null)
-        {
-            Log.e("mm","null");
-            return;
-        }
+        layout= (RelativeLayout) findViewById(R.id.relative);
+
+        layout.addView(updateView,new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
         Log.e("mm","success");
-        viewGroup.addView(updateView,new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        setContentView(viewGroup);
     }
 
     @Override
@@ -48,12 +59,20 @@ public class AndroidMain extends Activity {
     {
         super.onResume();
         updateView.resume();
+        Log.d("mm","onResume");
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onPause() {
+        super.onPause();
+        Log.e("mm", "pause");
         updateView.pause();
+    }
+
+    @Override
+    protected void onStop()
+    {
+        super.onStop();
     }
 
     public AndroidUpdateView getUpdateView() {
@@ -64,8 +83,23 @@ public class AndroidMain extends Activity {
     {
         return screenWidth;
     }
+
     public int getScreenHeight()
     {
         return screenHeight;
     }
+
+    public void addEditText(EditText editText)
+    {
+        layout.addView(editText);
+    }
+
+    @Override
+    public void onBackPressed() {
+        for (OnBackPressed o : pressList) {
+            o.onBackPress(this);
+        }
+    }
+    public void listenBackPress(OnBackPressed o) { pressList.add(o); }
+    public void removeBackPress(OnBackPressed o) { pressList.remove(o); }
 }
