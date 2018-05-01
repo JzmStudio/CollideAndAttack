@@ -5,24 +5,34 @@ import android.graphics.*;
 import Bases.Point;
 
 public class AndroidGraphics {
-    private AndroidMain main;
     private Canvas drawCanvas;
     private Paint paint;
     private Path path;
     private final RectF rectToDrawBitmap;   //仅用于画Bitmap
     private RectF rectF;
 
-    public AndroidGraphics(AndroidMain main)
+    public AndroidGraphics()
     {
-        this.main=main;
-        drawCanvas=main.getUpdateView().canvas;
         rectToDrawBitmap=new RectF();
         rectToDrawBitmap.left=0;
         rectToDrawBitmap.top=0;
         rectF=new RectF();
+        paint=new Paint();
+        path=new Path();
     }
 
-    public void changeCanvasToDraw(Canvas canvas)
+    public AndroidGraphics(Canvas canvas)
+    {
+        drawCanvas=canvas;
+        rectToDrawBitmap=new RectF();
+        rectToDrawBitmap.left=0;
+        rectToDrawBitmap.top=0;
+        rectF=new RectF();
+        paint=new Paint();
+        path=new Path();
+    }
+
+    public void setCanvasToDraw(Canvas canvas)
     {
         this.drawCanvas=canvas;
     }

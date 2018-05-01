@@ -27,10 +27,9 @@ public class AndroidMain extends Activity {
     private int screenHeight;
     private RelativeLayout layout;
     private AndroidUpdateView updateView;
+    private EditText editText;
     private AndroidStorage storage;
     private ArrayList<OnBackPressed> pressList; //返回键按下时的回调队列
-
-    public AndroidGraphics graphics;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,14 +42,15 @@ public class AndroidMain extends Activity {
 
         /*各功能初始化*/
         storage=new AndroidStorage(this);
-        graphics=new AndroidGraphics(this);
         pressList=new ArrayList<>(2);
 
         setContentView(R.layout.main_layout);
         updateView=new AndroidUpdateView(this);
         layout= (RelativeLayout) findViewById(R.id.relative);
-
+        editText=(EditText)findViewById(R.id.editText);
+        layout.removeAllViews();
         layout.addView(updateView,new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
+
         Log.e("mm","success");
     }
 
@@ -89,11 +89,6 @@ public class AndroidMain extends Activity {
         return screenHeight;
     }
 
-    public void addEditText(EditText editText)
-    {
-        layout.addView(editText);
-    }
-
     @Override
     public void onBackPressed() {
         for (OnBackPressed o : pressList) {
@@ -102,4 +97,13 @@ public class AndroidMain extends Activity {
     }
     public void listenBackPress(OnBackPressed o) { pressList.add(o); }
     public void removeBackPress(OnBackPressed o) { pressList.remove(o); }
+
+    public void addEditText()
+    {
+        layout.addView(editText);
+    }
+    public void addEditText(EditText editText, ViewGroup.LayoutParams layoutParams)
+    {
+        layout.addView(editText,layoutParams);
+    }
 }

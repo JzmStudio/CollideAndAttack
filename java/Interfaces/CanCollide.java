@@ -4,7 +4,7 @@ import Events.CollideEvent;
 
 public interface CanCollide {
 	/**
-	 * 在此函数中检测碰撞
+	 * 纰版挒鍥炶皟鍑芥暟
 	 */
 	void collide(CollideEvent collide);
 }

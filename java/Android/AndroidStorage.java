@@ -17,7 +17,7 @@ public class AndroidStorage {
     {
         this.main=main;
         path=main.getFilesDir();
-        Log.d("mm",path.getPath());
+        Log.d("debug",path.getPath());
         resources=main.getResources();
     }
 

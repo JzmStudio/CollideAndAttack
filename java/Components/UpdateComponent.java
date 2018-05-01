@@ -1,25 +1,36 @@
 package Components;
 
 import Events.CollideEvent;
+import Prefabs.GameObject;
+import Systems.SystemManager;
 
-public abstract class UpdateComponent {
-	UpdateComponent()
+public abstract class UpdateComponent extends Component{
+	UpdateComponent(GameObject gameObject)
 	{
-		
+		super(gameObject);
+		SystemManager.scriptSystem.addToUpdateList(this);
 	}
-	
+
 	/**
-	 * 在Update前被调用
+	 * 绋嬪簭寮�濮嬫椂璋冪敤
 	 */
 	abstract public void Start();
 	
 	/**
-	 * 画面更新及逻辑更新等
+	 * 姣忓抚鏇存柊璋冪敤
 	 */
 	abstract public void Update(float deltaTime);
-	
+
+	abstract public void onDestroy();
+
 	/**
-	 * 碰撞回调
+	 * 琚鎾炴椂璋冪敤
+	 * @param event
 	 */
 	abstract public void collide(CollideEvent event);
+
+	@Override
+	public void onRemove() {
+		SystemManager.scriptSystem.removeFromUpdateList(this);
+	}
 }

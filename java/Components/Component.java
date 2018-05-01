@@ -1,14 +1,17 @@
 package Components;
 
-import Interfaces.EngineAndControl;
+import Prefabs.GameObject;
 
-public class Component {
-	protected String name;	
-	protected EngineAndControl engine;
-	
-	public Component(String name,EngineAndControl engine)
+public abstract class Component {
+	protected GameObject gameObject;
+
+	public Component(GameObject gameObject)
 	{
-		this.name=name;
-		this.engine=engine;
+		this.gameObject=gameObject;
 	}
+
+	/**
+	 * 组件被移除时调用,子类需根据需要重写
+	 */
+	public abstract void onRemove();
 }

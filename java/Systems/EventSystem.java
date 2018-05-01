@@ -11,20 +11,29 @@ public class EventSystem {
 	private static HashMap<String, ArrayList<EventAction>> hash=new HashMap<String, ArrayList<EventAction>>();
 	
 	/**
-	 * ×¢²áÖ¸¶¨ÊÂ¼şµÄ¼àÌıÁ´±í
-	 * @param name ¸ù¾İÊÂ¼şÃûnameÇø·ÖÊÂ¼ş
+	 * åˆ›å»ºæ–°å›è°ƒäº‹ä»¶,ä»¥äº‹ä»¶çš„åç§°åŒºåˆ†äº‹ä»¶
+	 * @param eventName å›è°ƒæ—¶é—´çš„åç§°(ç‹¬æœ‰)
 	 */
-	public static void newEventListenerList(String name)
+	public static void newEventListenerList(String eventName)
 	{
-		if(!hash.containsKey(name))
+		if(!hash.containsKey(eventName))
 		{
-			hash.put(name, new ArrayList<EventAction>());
+			hash.put(eventName, new ArrayList<EventAction>());
 		}
+	}
+
+	/**
+	 * å–æ¶ˆæŸå›è°ƒäº‹ä»¶çš„ç›¸å…³ç›‘å¬è€…åˆ—è¡¨
+	 * @param eventName
+	 */
+	public static void removeEventListenerList(String eventName)
+	{
+		hash.remove(eventName);
 	}
 	
 	/**
-	 * Èç¹ûÓĞÏàÓ¦¹Û²ìÕß±í£¬ÔòÍ¨ÖªÏàÓ¦¹Û²ìÕß²¢·µ»Øtrue£¬·ñÔò·µ»Øfalse
-	 * @param e ? extends Event
+	 * å›è°ƒç›‘å¬è¯¥äº‹ä»¶çš„å›è°ƒå‡½æ•°
+	 * @param e ? extends Event ä»¥äº‹ä»¶çš„åç§°åŒºåˆ†äº‹ä»¶
 	 * @return
 	 */
 	public static boolean pushEvent(Event e)
@@ -39,25 +48,23 @@ public class EventSystem {
 	}
 	
 	/**
-	 * ×¢²áµ½ÏàÓ¦Ê±¼äµÄ×¢²á±íÖĞ
-	 * @param name ÏàÓ¦ÊÂ¼şµÄÃû³Æ
-	 * @param script ×¢²áĞèÊµÏÖEventAction½Ó¿Ú
-	 * @return
+	 * è®¾ç½®éœ€è¦ç›‘å¬çš„äº‹ä»¶
+	 * @param eventName æ‰€ç›‘å¬äº‹ä»¶çš„åç§°
+	 * @param script ? implements EventAction å›è°ƒå‡½æ•°
+	 * @return æˆåŠŸä¸ºtrue
 	 */
-	public static boolean registerToEventList(String name,EventAction script)
+	public static boolean registerToEventList(String eventName,EventAction script)
 	{
-		ArrayList<EventAction> list=hash.get(name);
+		ArrayList<EventAction> list=hash.get(eventName);
 		if(list==null) return false;
 		list.add(script);
 		return true;
 	}
-	
-	/**
-	 * É¾³ıÏàÓ¦ÊÂ¼şµÄ¼àÌıÁ´±í
-	 * @param name
-	 */
-	public static void removeEventListenerList(String name)
+
+	public static void removeFromEventList(String eventName,EventAction scrpit)
 	{
-		hash.remove(name);
+		ArrayList<EventAction> list=hash.get(eventName);
+		if(list==null) return;
+		list.remove(scrpit);
 	}
 }

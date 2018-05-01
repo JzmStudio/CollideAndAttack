@@ -2,7 +2,7 @@ package Interfaces;
 
 public interface CanUpdate {
 	/**
-	 * 每帧调用此函数
+	 * 每帧回调函数
 	 */
 	void update(long deltaMillisecond);
 }
