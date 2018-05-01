@@ -176,4 +176,23 @@ public class AndroidGraphics {
     {
         drawCanvas.drawBitmap(bitmap,srcRect,dstRect,null);
     }
+
+    /**
+     *
+     * @param s
+     * @param x
+     * @param y
+     * @param size
+     * @param color
+     * @param alpha 透明度
+     */
+    public void drawText(String s,float x,float y,float size,int color,int alpha)
+    {
+        paint.setTextSize(size);
+        paint.setColor(color);
+        paint.setStrokeWidth(3);
+        paint.setTextAlign(Paint.Align.CENTER);
+        paint.setAlpha(alpha);
+        drawCanvas.drawText(s, x, y, paint);
+    }
 }
