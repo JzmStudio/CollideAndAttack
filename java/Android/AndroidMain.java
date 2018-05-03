@@ -15,10 +15,13 @@ import android.widget.TextView;
 
 import com.example.collideandattack.R;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.zip.Inflater;
 
 import Interfaces.OnBackPressed;
+import Systems.SystemManager;
 
 
 public class AndroidMain extends Activity {
@@ -28,8 +31,9 @@ public class AndroidMain extends Activity {
     private RelativeLayout layout;
     private AndroidUpdateView updateView;
     private EditText editText;
-    private AndroidStorage storage;
     private ArrayList<OnBackPressed> pressList; //返回键按下时的回调队列
+    private AndroidStorage storage;
+    private SystemManager manager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +47,7 @@ public class AndroidMain extends Activity {
         /*各功能初始化*/
         storage=new AndroidStorage(this);
         pressList=new ArrayList<>(2);
+        storage=new AndroidStorage(this);
 
         setContentView(R.layout.main_layout);
         updateView=new AndroidUpdateView(this);
@@ -51,7 +56,8 @@ public class AndroidMain extends Activity {
         layout.removeAllViews();
         layout.addView(updateView,new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
 
-        Log.e("mm","success");
+        Log.d("mm","success");
+        manager=new SystemManager(this);
     }
 
     @Override
@@ -65,7 +71,7 @@ public class AndroidMain extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-        Log.e("mm", "pause");
+        Log.d("mm", "pause");
         updateView.pause();
     }
 
@@ -77,6 +83,10 @@ public class AndroidMain extends Activity {
 
     public AndroidUpdateView getUpdateView() {
         return updateView;
+    }
+
+    public AndroidStorage getStorage() {
+        return storage;
     }
 
     public int getScreenWidth()

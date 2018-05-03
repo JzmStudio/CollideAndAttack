@@ -8,7 +8,7 @@ public abstract class UpdateComponent extends Component{
 	UpdateComponent(GameObject gameObject)
 	{
 		super(gameObject);
-		SystemManager.scriptSystem.addToUpdateList(this);
+		SystemManager.getScriptSystem().addScript(this);
 	}
 
 	/**
@@ -31,6 +31,6 @@ public abstract class UpdateComponent extends Component{
 
 	@Override
 	public void onRemove() {
-		SystemManager.scriptSystem.removeFromUpdateList(this);
+		SystemManager.getScriptSystem().removeScript(this);
 	}
 }

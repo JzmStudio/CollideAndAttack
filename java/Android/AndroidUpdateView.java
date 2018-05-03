@@ -9,6 +9,7 @@ import android.view.SurfaceView;
 import java.util.ArrayList;
 
 import Interfaces.CanUpdate;
+import Interfaces.Start;
 import Interfaces.UpdateView;
 
 public class AndroidUpdateView extends SurfaceView implements Runnable{
@@ -23,17 +24,26 @@ public class AndroidUpdateView extends SurfaceView implements Runnable{
     private ArrayList<CanUpdate> updateList;
     private ArrayList<UpdateView> updateViewList;
     private SurfaceHolder holder;
+    private ArrayList<Start> startListeners;
+    private boolean isNew=true; //判断是否为游戏刚开始
 
     public AndroidUpdateView(Context context) {
         super(context);
         bitmap=Bitmap.createBitmap(targetWidth,targetHeight, Bitmap.Config.RGB_565);
         updateList=new ArrayList<>(5);
         updateViewList=new ArrayList<>(2);
+        startListeners=new ArrayList<>(2);
         holder=getHolder();
     }
 
     public void resume()
     {
+        if(isNew)
+        {
+            isNew=false;
+            for(Start o:startListeners)
+                o.start();
+        }
         isRun=true;
         this.updateThread=new Thread(this);
         updateThread.start();
@@ -110,5 +120,15 @@ public class AndroidUpdateView extends SurfaceView implements Runnable{
     public void removeFromUpdateViewList(UpdateView updateView)
     {
         updateViewList.remove(updateView);
+    }
+
+    public void addToStartList(Start o)
+    {
+        startListeners.add(o);
+    }
+
+    public void removeFromStartList(Start o)
+    {
+        startListeners.remove(o);
     }
 }

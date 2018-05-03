@@ -2,37 +2,35 @@ package Systems;
 
 import java.util.ArrayList;
 
+import Android.AndroidUpdateView;
 import Components.UpdateComponent;
 import Interfaces.CanUpdate;
+import Interfaces.Start;
 
-public class ScriptSystem implements CanUpdate{
+public class ScriptSystem implements CanUpdate, Start{
 	private ArrayList<UpdateComponent> list;
 	private float deltaTime;
 	
 	public ScriptSystem()
 	{
 		list=new ArrayList<UpdateComponent>();
-		Start();
 	}
 	
-	public void addToUpdateList(UpdateComponent script)
+	public void addScript(UpdateComponent script)
 	{
 		list.add(script);
 	}
 	
-	public void removeFromUpdateList(UpdateComponent script)
+	public void removeScript(UpdateComponent script)
 	{
 		list.remove(script);
 	}
-	
-	public void Start()
-	{
-		for(UpdateComponent s:list)
-		{
-			s.Start();
-		}
-	}
 
+	@Override
+	public void start() {
+		for(UpdateComponent o:list)
+			o.Start();
+	}
 	@Override
 	public void update(long deltaMillisecond) {
 		deltaTime=deltaMillisecond/1000.0f;

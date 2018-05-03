@@ -1,8 +1,9 @@
-package Components;
+package Components.ViewComponents;
 
 import java.util.ArrayList;
 
 import Bases.Point;
+import Components.Component;
 import Prefabs.GameObject;
 
 public class PointDescribe extends Component {
