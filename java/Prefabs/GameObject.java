@@ -1,33 +1,45 @@
 package Prefabs;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
-import Bases.*;
 import Components.Component;
-import Interfaces.EngineAndControl;
-import World.GameWorld;
+import Components.PhysicsComponents.Transform;
 
+/**
+ * 所有游戏对象默认含有一个Position组件,游戏一律用Android方式的坐标系
+ */
 public class GameObject {
-	private Point objectPosition;//GameObject世界坐标
-	private ArrayList<Component> components;
-	private String tag = "";
-	private GameWorld world;
+	private Transform localCoordinate;//GameObject世界坐标
+    private Map<String,ArrayList<Component>> components;
+	public String tag = "";
 
-	public GameObject(GameWorld world)
+	public GameObject()
 	{
-		this.world=world;
-		components = new ArrayList<Component>();
-		world.addGameObject(this);
+		components=new HashMap<>();
+		localCoordinate=new Transform(this);
+		addComponent(localCoordinate);
 	}
-	
-	public void setTag(String tag)
+
+	public GameObject(String tag)
 	{
-		this.tag = tag;
+		this.tag=tag;
+		components=new HashMap<>();
+		localCoordinate=new Transform(this);
+		addComponent(localCoordinate);
 	}
-	
-	public String getTag()
+
+	public GameObject(Transform position)
 	{
-		return this.tag;
+		components=new HashMap<>();
+		localCoordinate=new Transform(this);
+		addComponent(localCoordinate);
+	}
+
+	public ArrayList getComponent(String className)
+	{
+		return components.get(className);
 	}
 
 	/**
@@ -35,10 +47,43 @@ public class GameObject {
 	 */
 	public void destroy()
 	{
-		for(Component com:components){
-			com.onRemove();
-		}
+		for(ArrayList<Component> arrayList:components.values())
+			for(Component c:arrayList)
+				c.onRemove();
 		components.clear();
-		world.removeGameObject(this);
+	}
+
+	public void addComponent(Component component)
+	{
+		if(!components.containsKey(component.getClass().getSimpleName()))
+        {
+            components.put(component.getClass().getSimpleName(),new ArrayList());
+        }
+        else {
+			components.get(component.getClass().getSimpleName()).add(component);
+		}
+	}
+
+	/**
+	 * --------此函数调用需保证物体本身存在该component-----------
+	 * @param component
+	 */
+	public void removeComponent(Component component)
+	{
+		ArrayList<Component> arrayList=components.get(component.getClass().getSimpleName());
+		arrayList.remove(component);
+	}
+
+	public void removeComponents(String className)
+	{
+		components.remove(className);
+	}
+
+	public Transform getObjectPosition() {
+		return localCoordinate;
+	}
+
+	public void setObjectPosition(Transform localCoordinate) {
+		this.localCoordinate = localCoordinate;
 	}
 }

@@ -76,7 +76,6 @@ public class AndroidUpdateView extends SurfaceView implements Runnable{
             for(UpdateView u:updateViewList){
                 u.updateView(canvas);
             }
-            canvas.drawColor(0xFFFFF68F);
             holder.unlockCanvasAndPost(canvas);
 
             startTime=System.currentTimeMillis();

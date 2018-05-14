@@ -2,6 +2,8 @@ package Android;
 
 import android.graphics.*;
 
+import java.util.ArrayList;
+
 import Bases.Point;
 
 public class AndroidGraphics {
@@ -53,7 +55,7 @@ public class AndroidGraphics {
      * @param points
      * @param radius 线段拐点的角度(绘制圆角)
      */
-    public void drawCloseLine(int color, int width, Point[] points,int radius)
+    public void drawCloseLine(int color, int width, Point[] points,float radius)
     {
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(width);
@@ -72,22 +74,125 @@ public class AndroidGraphics {
     }
 
     /**
+     * 画封闭图形
+     * @param color
+     * @param width 线段宽度
+     * @param points
+     * @param radius 线段拐点的角度(绘制圆角)
+     */
+    public void drawCloseLine(int color, int width, ArrayList<Point> points, float radius)
+    {
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(width);
+        paint.setColor(color);
+        if(radius!=0)
+            paint.setPathEffect(new CornerPathEffect(radius));
+        path.reset();
+        path.moveTo(points.get(0).x,points.get(0).y);
+        for(int i=1;i<points.size();i++)
+        {
+            path.lineTo(points.get(i).x,points.get(i).y);
+        }
+        path.close();
+        drawCanvas.drawPath(path,paint);
+        paint.reset();
+    }
+
+    /**
+     * 画封闭图形
+     * @param color
+     * @param width 线段宽度
+     * @param points
+     * @param radius 线段拐点的角度(绘制圆角)
+     */
+    public void drawCloseLine(int color, int width, ArrayList<Point> points, float radius,Point localPosition)
+    {
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(width);
+        paint.setColor(color);
+        if(radius!=0)
+            paint.setPathEffect(new CornerPathEffect(radius));
+        path.reset();
+        path.moveTo(points.get(0).x+localPosition.x,points.get(0).y+localPosition.y);
+        for(int i=1;i<points.size();i++)
+        {
+            path.lineTo(points.get(i).x+localPosition.x,points.get(i).y+localPosition.y);
+        }
+        path.close();
+        drawCanvas.drawPath(path,paint);
+        paint.reset();
+    }
+
+    /**
+     * 画封闭图形
+     * @param color
+     * @param width 线段宽度
+     * @param points
+     * @param radius 线段拐点的角度(绘制圆角)
+     * @param localPosition ----本地坐标系在全局坐标系中的位置----
+     * @param degree ----本地坐标系旋转角度----
+     */
+    public void drawCloseLine(int color, int width, ArrayList<Point> points, float radius,Point localPosition,float degree)
+    {
+        drawCanvas.save();
+        drawCanvas.rotate(degree);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(width);
+        paint.setColor(color);
+        if(radius!=0)
+            paint.setPathEffect(new CornerPathEffect(radius));
+        path.reset();
+        path.moveTo(points.get(0).x+localPosition.x,points.get(0).y+localPosition.y);
+        for(int i=1;i<points.size();i++)
+        {
+            path.lineTo(points.get(i).x+localPosition.x,points.get(i).y+localPosition.y);
+        }
+        path.close();
+        drawCanvas.drawPath(path,paint);
+        paint.reset();
+        drawCanvas.restore();
+    }
+
+    /**
      *
      * @param color
      * @param points
      * @param radius 线段拐点的角度(绘制圆角)
      */
-    public void fillCloseLine(int color,Point[] points,int radius)
+    public void fillCloseLine(int color,ArrayList<Point> points,int radius)
     {
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(color);
         if(radius!=0)
             paint.setPathEffect(new CornerPathEffect(radius));
         path.reset();
-        path.moveTo(points[0].x,points[0].y);
-        for(int i=1;i<points.length;i++)
+        path.moveTo(points.get(0).x,points.get(0).y);
+        for(int i=1;i<points.size();i++)
         {
-            path.lineTo(points[i].x,points[i].y);
+            path.lineTo(points.get(i).x,points.get(i).y);
+        }
+        path.close();
+        drawCanvas.drawPath(path,paint);
+        path.reset();
+    }
+
+    /**
+     *
+     * @param color
+     * @param points
+     * @param radius 线段拐点的角度(绘制圆角)
+     */
+    public void fillCloseLine(int color,ArrayList<Point> points,int radius,Point localPosition)
+    {
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(color);
+        if(radius!=0)
+            paint.setPathEffect(new CornerPathEffect(radius));
+        path.reset();
+        path.moveTo(points.get(0).x+localPosition.x,points.get(0).y+localPosition.y);
+        for(int i=1;i<points.size();i++)
+        {
+            path.lineTo(points.get(i).x+localPosition.x,points.get(i).y+localPosition.y);
         }
         path.close();
         drawCanvas.drawPath(path,paint);
@@ -157,10 +262,26 @@ public class AndroidGraphics {
         drawCanvas.drawCircle(x,y,r,paint);
     }
 
+    /**
+     *
+     * @param bitmap
+     * @param x left
+     * @param y top
+     * @param degree
+     */
     public void drawBitmap(Bitmap bitmap,float x,float y,float degree)
     {
         drawCanvas.save();
         drawCanvas.translate(x,y);
+        drawCanvas.rotate(degree);
+        drawCanvas.drawBitmap(bitmap,0,0,null);
+        drawCanvas.restore();
+    }
+
+    public void drawBitmap(Bitmap bitmap,float x,float y,float degree,Point localPosition)
+    {
+        drawCanvas.save();
+        drawCanvas.translate(x+localPosition.x,y+localPosition.y);
         drawCanvas.rotate(degree);
         drawCanvas.drawBitmap(bitmap,0,0,null);
         drawCanvas.restore();
@@ -194,5 +315,24 @@ public class AndroidGraphics {
         paint.setTextAlign(Paint.Align.CENTER);
         paint.setAlpha(alpha);
         drawCanvas.drawText(s, x, y, paint);
+    }
+
+    /**
+     *
+     * @param s
+     * @param x
+     * @param y
+     * @param size
+     * @param color
+     * @param alpha 透明度
+     */
+    public void drawText(String s,float x,float y,float size,int color,int alpha,Point localPosition)
+    {
+        paint.setTextSize(size);
+        paint.setColor(color);
+        paint.setStrokeWidth(3);
+        paint.setTextAlign(Paint.Align.CENTER);
+        paint.setAlpha(alpha);
+        drawCanvas.drawText(s, x+localPosition.x, y+localPosition.y, paint);
     }
 }

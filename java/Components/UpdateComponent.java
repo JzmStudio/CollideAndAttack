@@ -4,24 +4,25 @@ import Events.CollideEvent;
 import Prefabs.GameObject;
 import Systems.SystemManager;
 
+/**
+ * -------一定在所有组件里最后添加脚本---------
+ */
 public abstract class UpdateComponent extends Component{
+
 	UpdateComponent(GameObject gameObject)
 	{
 		super(gameObject);
-		SystemManager.getScriptSystem().addScript(this);
 	}
-
-	/**
-	 * 程序开始时调用
-	 */
-	abstract public void Start();
 	
 	/**
 	 * 每帧更新调用
 	 */
 	abstract public void Update(float deltaTime);
 
-	abstract public void onDestroy();
+	/**
+	 * 所依附的游戏对象被摧毁时调用
+	 */
+	public void onDestroy() {}
 
 	/**
 	 * 被碰撞时调用
@@ -31,6 +32,12 @@ public abstract class UpdateComponent extends Component{
 
 	@Override
 	public void onRemove() {
-		SystemManager.getScriptSystem().removeScript(this);
+		onDestroy();
+	}
+
+	@Override
+	public void removeThis()
+	{
+		super.removeThis();
 	}
 }

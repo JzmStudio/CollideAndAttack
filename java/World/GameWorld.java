@@ -13,4 +13,11 @@ public class GameWorld {
 
     public void addGameObject(GameObject object) {objects.add(object);}
     public void removeGameObject(GameObject object) {objects.remove(object);}
+
+    public void releaseThisWorld()
+    {
+        for(GameObject obj:objects){
+            obj.destroy();
+        }
+    }
 }

@@ -6,7 +6,7 @@ public class Point {
 	
 	public static final Point zero=new Point(0,0);
 	
-	public Boolean isCollide=false; //如果所在边有碰撞则为true
+	public Boolean isCollide=false;
 	
 	public Point()
 	{

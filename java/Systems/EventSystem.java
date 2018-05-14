@@ -8,7 +8,12 @@ import Interfaces.EventAction;
 
 public class EventSystem {
 	
-	private static HashMap<String, ArrayList<EventAction>> hash=new HashMap<String, ArrayList<EventAction>>();
+	private static final HashMap<String, ArrayList<EventAction>> hash=new HashMap<String, ArrayList<EventAction>>();
+
+	public EventSystem()
+	{
+		//加入预置事件等
+	}
 	
 	/**
 	 * 创建新回调事件,以事件的名称区分事件
