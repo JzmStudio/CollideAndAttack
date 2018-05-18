@@ -1,9 +1,12 @@
 package Prefabs;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import Bases.Position;
 import Components.Component;
 import Components.PhysicsComponents.Transform;
 
@@ -30,10 +33,10 @@ public class GameObject {
 		addComponent(localCoordinate);
 	}
 
-	public GameObject(Transform position)
+	public GameObject(Position position)
 	{
 		components=new HashMap<>();
-		localCoordinate=new Transform(this);
+		localCoordinate=new Transform(this,position);
 		addComponent(localCoordinate);
 	}
 
@@ -55,9 +58,12 @@ public class GameObject {
 
 	public void addComponent(Component component)
 	{
+		Log.d("AddGamCom",component.getClass().getSimpleName());
 		if(!components.containsKey(component.getClass().getSimpleName()))
         {
-            components.put(component.getClass().getSimpleName(),new ArrayList());
+        	ArrayList<Component> arrayList=new ArrayList<>();
+        	arrayList.add(component);
+            components.put(component.getClass().getSimpleName(),arrayList);
         }
         else {
 			components.get(component.getClass().getSimpleName()).add(component);

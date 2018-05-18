@@ -6,6 +6,7 @@ import java.util.Arrays;
 import Bases.Point;
 import Components.ViewComponent;
 import Prefabs.GameObject;
+import Systems.SystemManager;
 
 /**
  * 由坐标点描述的封闭图形
@@ -22,6 +23,7 @@ public class ClosePointView extends ViewComponent {
     {
         super(gameObject);
         points=new ArrayList<>(6);
+        SystemManager.getViewSystem().addViewComponent(this);
     }
 
     public ClosePointView(GameObject gameObject,Point...fs)
@@ -29,6 +31,7 @@ public class ClosePointView extends ViewComponent {
         super(gameObject);
         points=new ArrayList<>();
         points.addAll(Arrays.asList(fs));
+        SystemManager.getViewSystem().addViewComponent(this);
     }
 
     public ClosePointView(GameObject gameObject,int color,int width,int radius,Point...fs)
@@ -39,6 +42,7 @@ public class ClosePointView extends ViewComponent {
         this.color=color;
         this.width=width;
         this.radius=radius;
+        SystemManager.getViewSystem().addViewComponent(this);
     }
 
     public void addPoints(Point...fs)

@@ -20,6 +20,7 @@ public class AndroidStorage {
     private AndroidMain main;
     private File path;
     private Resources resources;
+    private String packageName;
 
     public AndroidStorage(AndroidMain main)
     {
@@ -27,6 +28,7 @@ public class AndroidStorage {
         path=main.getFilesDir();
         Log.d("debug",path.getPath());
         resources=main.getResources();
+        packageName=main.getPackageName();
     }
 
     public Bitmap getBitmapFromAssets(int id, Bitmap.Config config)
@@ -43,6 +45,34 @@ public class AndroidStorage {
         {
             bitmap=BitmapFactory.decodeStream(input);
         }
+        if(bitmap==null)
+            Log.e("decode","error");
+        return bitmap;
+    }
+
+    /**
+     *
+     * @param name
+     * @param deftype 资源在哪个类型中,如"drawable"等
+     * @param config
+     * @return
+     */
+    public Bitmap getBitmapFromAssets(String name,String deftype, Bitmap.Config config)
+    {
+        Bitmap bitmap;
+        InputStream input=resources.openRawResource(resources.getIdentifier(name,deftype,packageName));
+        if(config!=null)
+        {
+            BitmapFactory.Options options=new BitmapFactory.Options();
+            options.inPreferredConfig=config;
+            bitmap=BitmapFactory.decodeStream(input,null,options);
+        }
+        else
+        {
+            bitmap=BitmapFactory.decodeStream(input);
+        }
+        if(bitmap==null)
+            Log.e("decode","error");
         return bitmap;
     }
 

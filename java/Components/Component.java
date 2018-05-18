@@ -1,5 +1,7 @@
 package Components;
 
+import android.util.Log;
+
 import Prefabs.GameObject;
 import Systems.SystemManager;
 
@@ -23,13 +25,15 @@ public abstract class Component {
 	 */
 	public void onRemove()
 	{
+		Log.d("Remove",this.getClass().getSimpleName());
 		SystemManager.removeComponent(this);
 	}
 
 	/**
 	 * 移除这个组件(主动移除)
+	 * ------此方法不要重写-----
 	 */
-	public void removeThis()
+	public final void removeThis()
 	{
 		gameObject.removeComponent(this);
 		onRemove();

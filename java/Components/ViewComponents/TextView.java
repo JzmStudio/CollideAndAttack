@@ -2,6 +2,7 @@ package Components.ViewComponents;
 
 import Components.ViewComponent;
 import Prefabs.GameObject;
+import Systems.SystemManager;
 
 public class TextView extends ViewComponent {
     public String text;
@@ -12,5 +13,6 @@ public class TextView extends ViewComponent {
     public TextView(GameObject gameObject,String text) {
         super(gameObject);
         this.text=text;
+        SystemManager.getViewSystem().addViewComponent(this);
     }
 }

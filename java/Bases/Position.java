@@ -1,10 +1,13 @@
 package Bases;
 
+import android.util.Log;
+
 public class Position {
     public static final double PI=Math.PI;
+    private static final double convertValue=Math.PI/180f;
     public Point point;
     /**
-     * 逆时针方向为+,弧度表示
+     * 逆时针方向为+,角度表示
      */
     public float degree;
 
@@ -27,8 +30,8 @@ public class Position {
      */
     public static Point transferToGlobal(Position localCoordinate,Point localPosition)
     {
-        float cos=(float)Math.cos(localCoordinate.degree);
-        float sin= (float) Math.sin(localCoordinate.degree);
+        float cos=(float)Math.cos(localCoordinate.degree*convertValue);
+        float sin= (float) Math.sin(localCoordinate.degree*convertValue);
         return new Point(localPosition.x*cos-localPosition.y*sin+localCoordinate.point.x,
                 localPosition.x*sin+localPosition.y*cos+localCoordinate.point.y);
     }
@@ -41,8 +44,8 @@ public class Position {
      */
     public static void transferToGlobal(Position localCoordinate,Point localPosition,Point globalPosition)
     {
-        float cos=(float)Math.cos(localCoordinate.degree);
-        float sin= (float) Math.sin(localCoordinate.degree);
+        float cos=(float)Math.cos(localCoordinate.degree*convertValue);
+        float sin= (float) Math.sin(localCoordinate.degree*convertValue);
         globalPosition.x=localPosition.x*cos-localPosition.y*sin+localCoordinate.point.x;
         globalPosition.y=localPosition.x*sin+localPosition.y*cos+localCoordinate.point.y;
     }
@@ -55,8 +58,8 @@ public class Position {
      */
     public static void transferToLocal(Position localCoordinate,Point globalPosition,Point localPosition)
     {
-        float cos=(float)Math.cos(localCoordinate.degree);
-        float sin= (float) Math.sin(localCoordinate.degree);
+        float cos=(float)Math.cos(localCoordinate.degree*convertValue);
+        float sin= (float) Math.sin(localCoordinate.degree*convertValue);
         localPosition.x=globalPosition.x*cos+globalPosition.y*sin-localCoordinate.point.x;
         localPosition.y=globalPosition.y*cos-globalPosition.x*sin-localCoordinate.point.y;
     }

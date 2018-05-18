@@ -6,6 +6,9 @@ import java.util.ArrayList;
 
 import Bases.Point;
 
+/**
+ * 此类里面所有角度顺时针为+
+ */
 public class AndroidGraphics {
     private Canvas drawCanvas;
     private Paint paint;
@@ -182,7 +185,7 @@ public class AndroidGraphics {
      * @param points
      * @param radius 线段拐点的角度(绘制圆角)
      */
-    public void fillCloseLine(int color,ArrayList<Point> points,int radius,Point localPosition)
+    public void fillCloseLine(int color,ArrayList<Point> points,float radius,Point localPosition)
     {
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(color);
@@ -205,13 +208,13 @@ public class AndroidGraphics {
      * @param top
      * @param right
      * @param bottom
-     * @param width
+     * @param strockWidth 画笔粗细
      * @param radius 圆角的角度
      * @param color
      */
-    public void drawRoundRect(float left,float top,float right,float bottom,float width,int radius,int color)
+    public void drawRoundRect(float left,float top,float right,float bottom,float strockWidth,float radius,int color)
     {
-        paint.setStrokeWidth(width);
+        paint.setStrokeWidth(strockWidth);
         paint.setColor(color);
         paint.setStyle(Paint.Style.STROKE);
         rectF.left=left;
@@ -221,7 +224,27 @@ public class AndroidGraphics {
         drawCanvas.drawRoundRect(rectF, radius, radius, paint);
     }
 
-    public void fillRoundRect(float left,float top,float right,float bottom,int radius,int color)
+    /**
+     * 画圆角矩形
+     * @param radius 圆角的角度
+     */
+    public void drawRoundRect(float left,float top,float width,float height,float strockWidth,float radius,int color,float degree)
+    {
+        drawCanvas.save();
+        drawCanvas.translate(left,top);
+        drawCanvas.rotate(degree);
+        paint.setStrokeWidth(width);
+        paint.setColor(color);
+        paint.setStyle(Paint.Style.STROKE);
+        rectF.left=0;
+        rectF.top=0;
+        rectF.right=width;
+        rectF.bottom=height;
+        drawCanvas.drawRoundRect(rectF, radius, radius, paint);
+        drawCanvas.restore();
+    }
+
+    public void fillRoundRect(float left,float top,float right,float bottom,float radius,int color)
     {
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(color);
@@ -230,6 +253,21 @@ public class AndroidGraphics {
         rectF.right=right;
         rectF.bottom=bottom;
         drawCanvas.drawRoundRect(rectF, radius, radius, paint);
+    }
+
+    public void fillRoundRect(float left,float top,float width,float height,float radius,int color,float degree)
+    {
+        drawCanvas.save();
+        drawCanvas.translate(left,top);
+        drawCanvas.rotate(degree);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(color);
+        rectF.left=0;
+        rectF.top=0;
+        rectF.right=width;
+        rectF.bottom=height;
+        drawCanvas.drawRoundRect(rectF, radius, radius, paint);
+        drawCanvas.restore();
     }
 
     /**
@@ -302,7 +340,7 @@ public class AndroidGraphics {
      *
      * @param s
      * @param x
-     * @param y
+     * @param y 基线的位置
      * @param size
      * @param color
      * @param alpha 透明度
@@ -321,7 +359,7 @@ public class AndroidGraphics {
      *
      * @param s
      * @param x
-     * @param y
+     * @param y 基线的位置
      * @param size
      * @param color
      * @param alpha 透明度
@@ -334,5 +372,29 @@ public class AndroidGraphics {
         paint.setTextAlign(Paint.Align.CENTER);
         paint.setAlpha(alpha);
         drawCanvas.drawText(s, x+localPosition.x, y+localPosition.y, paint);
+    }
+
+    /**
+     *
+     * @param s
+     * @param x
+     * @param y 基线的位置
+     * @param size
+     * @param color
+     * @param alpha
+     * @param degree
+     */
+    public void drawText(String s,float x,float y,float size,int color,int alpha,float degree)
+    {
+        drawCanvas.save();
+        drawCanvas.translate(x,y);
+        drawCanvas.rotate(degree);
+        paint.setTextSize(size);
+        paint.setColor(color);
+        paint.setStrokeWidth(3);
+        paint.setTextAlign(Paint.Align.CENTER);
+        paint.setAlpha(alpha);
+        drawCanvas.drawText(s, 0, 0, paint);
+        drawCanvas.restore();
     }
 }

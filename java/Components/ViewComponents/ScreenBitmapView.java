@@ -18,17 +18,20 @@ public class ScreenBitmapView extends ViewComponent {
         super(gameObject);
         this.bitmapId=bitmapId;
         bitmap= SystemManager.getStorage().getBitmapFromAssets(bitmapId,config);
+        SystemManager.getViewSystem().addViewComponent(this);
     }
 
     public ScreenBitmapView(GameObject gameObject,int bitmapId, Bitmap.Config config,int deep) {
         super(gameObject, deep);
         this.bitmapId=bitmapId;
         bitmap= SystemManager.getStorage().getBitmapFromAssets(bitmapId,config);
+        SystemManager.getViewSystem().addViewComponent(this);
     }
 
     public ScreenBitmapView(GameObject gameObject,int bitmapId, Bitmap.Config config, float x, float y, int deep) {
         super(gameObject, x, y, deep);
         this.bitmapId=bitmapId;
         bitmap= SystemManager.getStorage().getBitmapFromAssets(bitmapId,config);
+        SystemManager.getViewSystem().addViewComponent(this);
     }
 }

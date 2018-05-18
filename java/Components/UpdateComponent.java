@@ -1,5 +1,7 @@
 package Components;
 
+import android.util.Log;
+
 import Events.CollideEvent;
 import Prefabs.GameObject;
 import Systems.SystemManager;
@@ -9,7 +11,7 @@ import Systems.SystemManager;
  */
 public abstract class UpdateComponent extends Component{
 
-	UpdateComponent(GameObject gameObject)
+	public UpdateComponent(GameObject gameObject)
 	{
 		super(gameObject);
 	}
@@ -17,7 +19,7 @@ public abstract class UpdateComponent extends Component{
 	/**
 	 * 每帧更新调用
 	 */
-	abstract public void Update(float deltaTime);
+	abstract public void Update(float deltaMillisecond);
 
 	/**
 	 * 所依附的游戏对象被摧毁时调用
@@ -32,12 +34,7 @@ public abstract class UpdateComponent extends Component{
 
 	@Override
 	public void onRemove() {
+		super.onRemove();
 		onDestroy();
-	}
-
-	@Override
-	public void removeThis()
-	{
-		super.removeThis();
 	}
 }

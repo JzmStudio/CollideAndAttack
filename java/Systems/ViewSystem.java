@@ -18,6 +18,7 @@ import Components.ViewComponent;
 import Components.ViewComponents.BitmapView;
 import Components.ViewComponents.ClosePointView;
 import Components.ViewComponents.ScreenBitmapView;
+import Components.ViewComponents.ScreenRectView;
 import Components.ViewComponents.TextView;
 import Interfaces.UpdateView;
 
@@ -32,17 +33,19 @@ public class ViewSystem implements UpdateView{
     private ArrayList<ClosePointView> closePointViews;
     private ArrayList<TextView> textViews;
     private ArrayList<ScreenBitmapView> screenBitmapViews;
+    //private ArrayList<OnDraw> initList; //绘画内部类的初始化,以避免空引用及计算浪费
     private Position cemeraPosition;
-    /*相机的最大可视范围*/
-    private float left;
-    private float right;
-    private float top;
-    private float bottom;
 
-    private int targetScreenWidth=1920; //目标绘制坐标横范围
-    private int targetScreenHeight=1080;    //目标绘制坐标纵范围
-    private float halfTargetWidth; //相机最大显示半径,方便是否显示的计算
-    private float halfTargetHeight;
+    public static final int targetScreenWidth=1920; //目标绘制坐标横范围
+    public static final int targetScreenHeight=1080;    //目标绘制坐标纵范围
+    public static final float halfTargetWidth=targetScreenWidth/2; //相机最大显示半径,方便是否显示的计算
+    public static final float halfTargetHeight=targetScreenHeight/2;
+    /*相机的最大可视范围*/
+    private final float left=-halfTargetWidth;
+    private final float right=halfTargetWidth;
+    private final float top=halfTargetHeight;
+    private final float bottom=-halfTargetHeight;
+
     private Bitmap bitmap=Bitmap.createBitmap(1920,1080, Bitmap.Config.RGB_565);
     private Canvas canvas;  //先绘制到此Canvas上再绘制到手机屏幕
     private RectF dstRect;
@@ -66,6 +69,7 @@ public class ViewSystem implements UpdateView{
         closePointViews=SystemManager.addComponentList("ClosePointView");
         textViews=SystemManager.addComponentList("TextView");
         screenBitmapViews=SystemManager.addComponentList("ScreenBitmapView");
+        //initList=new ArrayList<>();
 
         /*进行屏幕显示的自适应调整*/
         canvas=new Canvas(bitmap);
@@ -89,14 +93,11 @@ public class ViewSystem implements UpdateView{
         }
         //Cemera
         cemeraPosition=new Position();
-        /*计算目标屏幕长宽的一半*/
-        halfTargetWidth=targetScreenWidth/2;
-        halfTargetHeight=targetScreenHeight/2;
 
         SystemManager.getMainActivity().getUpdateView().addToUpdateViewList(this);
     }
 
-    public void addViewCompoent(ViewComponent viewComponent)
+    /*public void addViewComponent(ViewComponent viewComponent)
     {
         Log.d("addView",viewComponent.getClass().getSimpleName());
         OnDraw draw=null;
@@ -119,8 +120,41 @@ public class ViewSystem implements UpdateView{
         else {
             return;
         }
-        drawQueue.add(draw);
+        drawQueue.add(draw);    //加入绘图优先队列
+        initList.add(draw);     //加入初始化队列
         sysDrawCorrelate.put(viewComponent,draw);
+    }*/
+
+    public void addViewComponent(BitmapView bitmapView)
+    {
+        addToDraw(new BitmapDraw(bitmapView));
+    }
+
+    public void addViewComponent(ClosePointView closePointView)
+    {
+        addToDraw(new ClosePointDraw(closePointView));
+    }
+
+    public void addViewComponent(ScreenBitmapView screenBitmapView)
+    {
+        addToDraw(new ScreenBitmapDraw(screenBitmapView));
+    }
+
+    public void addViewComponent(ScreenRectView screenRectView)
+    {
+        addToDraw(new ScreenRectDraw(screenRectView));
+    }
+
+    public void addViewComponent(TextView textView)
+    {
+        addToDraw(new TextDraw(textView));
+    }
+
+    private void addToDraw(OnDraw draw)
+    {
+        drawQueue.add(draw);    //加入绘图优先队列
+        //initList.add(draw);     //加入初始化队列
+        sysDrawCorrelate.put(draw.view,draw);
     }
 
     public void changeDeep(ViewComponent viewComponent)
@@ -132,10 +166,12 @@ public class ViewSystem implements UpdateView{
 
     @Override
     public void updateView(Canvas updateCanvas) {
-        left=cemeraPosition.point.x-halfTargetWidth;
-        right=cemeraPosition.point.x+halfTargetWidth;
-        top=cemeraPosition.point.y+halfTargetHeight;
-        bottom=cemeraPosition.point.y-halfTargetHeight;
+        /*若有绘图内部类未初始化则先初始化,并移出队列*/
+//        for(int i=0;i<initList.size();i++)
+//        {
+//            initList.remove(i).init();
+//        }
+        /*绘图*/
         for(OnDraw com:drawQueue)
         {
             com.onDraw();
@@ -155,6 +191,10 @@ public class ViewSystem implements UpdateView{
     public void setCemeraPosition(Position position)
     {
         cemeraPosition=position;
+    }
+
+    public Position getCemeraPosition() {
+        return cemeraPosition;
     }
 
     /**
@@ -197,11 +237,14 @@ public class ViewSystem implements UpdateView{
         Point globalPoint;
         Point cemeraPoint;  //相机坐标系下的坐标
         float len;
+        //String name;
         BitmapDraw(ViewComponent viewComponent) {
             super(viewComponent);
             globalPoint=new Point();
             cemeraPoint=new Point();
+            //name=viewComponent.getClass().getSimpleName();
             BitmapView b=(BitmapView)view;
+            //由于尚未初始化完CPU控制权交给了这里导致出现异常
             int w=b.bitmap.getWidth();
             int h=b.bitmap.getHeight();
             len= (float) Math.sqrt(w*w+h*h);
@@ -210,11 +253,18 @@ public class ViewSystem implements UpdateView{
         @Override
         void onDraw() {
             BitmapView b=(BitmapView)view;
+            if(!b.isVisible) return;
             Transform localCoordinate=view.getGameObject().getObjectPosition();
+            //Log.d("Local",""+view.position.point.x+" "+view.position.point.y);
+            //Log.d("Draw",name);
             Position.transferToGlobal(localCoordinate.position,b.position.point,globalPoint);
-            Position.transferToLocal(localCoordinate.position,globalPoint,cemeraPoint);
+            //Log.d("Global",""+globalPoint.x+" "+globalPoint.y);
+            Position.transferToLocal(cemeraPosition,globalPoint,cemeraPoint);
+            //Log.d("Cem",""+cemeraPoint.x+" "+cemeraPoint.y);
+            //Log.d("LLL",""+left+" "+right+" "+bottom+" "+top+" "+cemeraPoint.x+" "+cemeraPoint.y);
             if(cemeraPoint.x+len<left||cemeraPoint.x-len>right||cemeraPoint.y+len<bottom||cemeraPoint.y-len>top) return;
             graphics.drawBitmap(b.bitmap,halfTargetWidth+cemeraPoint.x,halfTargetHeight-cemeraPoint.y,cemeraPosition.degree-b.position.degree-localCoordinate.position.degree);
+            //Log.d("Location",""+(halfTargetWidth+cemeraPoint.x)+(halfTargetHeight-cemeraPoint.y));
         }
     }
 
@@ -239,25 +289,50 @@ public class ViewSystem implements UpdateView{
     }
 
     private class TextDraw extends OnDraw{
+        Point globalPoint;
+        Point cemeraPoint;
         TextDraw(ViewComponent viewComponent) {
             super(viewComponent);
+            globalPoint=new Point();
+            cemeraPoint=new Point();
         }
         @Override
         void onDraw() {
-
+            TextView t= (TextView) view;
+            Position localCoordinate=t.getGameObject().getObjectPosition().position;
+            Position.transferToGlobal(localCoordinate,t.position.point,globalPoint);
+            Position.transferToLocal(cemeraPosition,globalPoint,cemeraPoint);
+            graphics.drawText(t.text,cemeraPoint.x,cemeraPoint.y,t.size,t.color,t.alpha, cemeraPosition.degree-t.position.degree-localCoordinate.degree);
         }
     }
 
     private class ScreenBitmapDraw extends OnDraw{
-
+        String name;
         ScreenBitmapDraw(ViewComponent viewComponent) {
+            super(viewComponent);
+            name=viewComponent.getClass().getSimpleName();
+        }
+
+        @Override
+        void onDraw() {
+            Log.d("Draw",name);
+            ScreenBitmapView b= (ScreenBitmapView) view;
+            graphics.drawBitmap(b.bitmap,b.position.point.x,b.position.point.y,-b.position.degree);
+        }
+    }
+
+    private class ScreenRectDraw extends OnDraw{
+        ScreenRectDraw(ViewComponent viewComponent) {
             super(viewComponent);
         }
 
         @Override
         void onDraw() {
-            ScreenBitmapView b= (ScreenBitmapView) view;
-            graphics.drawBitmap(b.bitmap,b.position.point.x,b.position.point.y,b.position.degree);
+            ScreenRectView v= (ScreenRectView) view;
+            if(v.isFill)
+                graphics.fillRoundRect(v.position.point.x,v.position.point.y,v.width,v.height,v.radius,v.color,-v.position.degree);
+            else
+                graphics.drawRoundRect(v.position.point.x,v.position.point.y,v.width,v.height,v.strockWidth,v.radius,v.color,-v.position.degree);
         }
     }
 }

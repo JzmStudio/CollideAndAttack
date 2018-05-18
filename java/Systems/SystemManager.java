@@ -8,6 +8,7 @@ import java.util.HashMap;
 import Android.AndroidMain;
 import Android.AndroidStorage;
 import Components.Component;
+import Components.UpdateComponent;
 import World.GameWorld;
 import World.StartGameWorld;
 
@@ -70,8 +71,15 @@ public class SystemManager {
      */
     public static void removeComponent(Component component)
     {
+        /*若为脚本组件交由脚本系统处理,防止出现ConcurrentModificationException*/
+        if(component instanceof UpdateComponent)
+        {
+            scriptSystem.removeScript((UpdateComponent) component);
+            return;
+        }
         ArrayList arrayList=components.get(component.getClass().getSimpleName());
         arrayList.remove(component);
+        //Log.d("RemoveComponent",classname);
     }
 
     /**
@@ -94,16 +102,22 @@ public class SystemManager {
 
     public static void addComponent(Component component)
     {
-        Log.d("add",component.getClass().getSimpleName());
-        if(!components.containsKey(component.getClass().getSimpleName()))
+        String classname=component.getClass().getSimpleName();
+        /*脚本是由用户定义的新组件,所以此处做判断*/
+        if(component instanceof UpdateComponent)
+        {
+            classname="UpdateComponent";
+        }
+        if(!components.containsKey(classname))
         {
             ArrayList<Component> arrayList=new ArrayList<>();
             arrayList.add(component);
-            components.put(component.getClass().getSimpleName(),arrayList);
+            components.put(classname,arrayList);
         }
         else {
-            components.get(component.getClass().getSimpleName()).add(component);
+            components.get(classname).add(component);
         }
+        Log.d("SystemAdd",classname);
     }
 
     public static AndroidMain getMainActivity(){

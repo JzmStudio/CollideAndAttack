@@ -56,8 +56,8 @@ public class AndroidMain extends Activity {
         layout.removeAllViews();
         layout.addView(updateView,new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
 
-        Log.d("mm","success");
         manager=new SystemManager(this);
+        Log.d("mm","success");
     }
 
     @Override

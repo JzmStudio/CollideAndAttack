@@ -38,7 +38,7 @@ public class EventSystem {
 	
 	/**
 	 * 回调监听该事件的回调函数
-	 * @param e ? extends Event 以事件的名称区分事件
+	 * @param e ? extends Event 以事件的名称区分事件,不能为null
 	 * @return
 	 */
 	public static boolean pushEvent(Event e)
@@ -51,19 +51,37 @@ public class EventSystem {
 		}
 		return true;
 	}
-	
+
 	/**
-	 * 设置需要监听的事件
-	 * @param eventName 所监听事件的名称
-	 * @param script ? implements EventAction 回调函数
-	 * @return 成功为true
+	 * 若不需要事件则可调用此函数,event为null
+	 * @param eventName 时间名称
+	 * @return
 	 */
-	public static boolean registerToEventList(String eventName,EventAction script)
+	public static boolean pushEvent(String eventName)
 	{
 		ArrayList<EventAction> list=hash.get(eventName);
 		if(list==null) return false;
-		list.add(script);
+		for(EventAction script:list)
+		{
+			script.action(null);
+		}
 		return true;
+	}
+	
+	/**
+	 * 设置需要监听的事件,若未创建事件的监听列表则先创建
+	 * @param eventName 所监听事件的名称
+	 * @param script ? implements EventAction 回调函数
+	 */
+	public static void registerToEventList(String eventName,EventAction script)
+	{
+		ArrayList<EventAction> list=hash.get(eventName);
+		if(list==null)
+		{
+			list=new ArrayList<>();
+			hash.put(eventName,list);
+		}
+		list.add(script);
 	}
 
 	public static void removeFromEventList(String eventName,EventAction scrpit)

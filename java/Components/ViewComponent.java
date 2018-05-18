@@ -33,7 +33,6 @@ public class ViewComponent extends Component {
     public ViewComponent(GameObject gameObject) {
         super(gameObject);
         deep=0;
-        SystemManager.getViewSystem().addViewCompoent(this);
         position=new Position();
     }
 
@@ -45,15 +44,19 @@ public class ViewComponent extends Component {
     public ViewComponent(GameObject gameObject,int deep) {
         super(gameObject);
         this.deep=deep;
-        SystemManager.getViewSystem().addViewCompoent(this);
         position=new Position();
     }
 
     public ViewComponent(GameObject gameObject,float x,float y,int deep) {
         super(gameObject);
         this.deep=deep;
-        SystemManager.getViewSystem().addViewCompoent(this);
         position=new Position(x,y,0);
+    }
+
+    public ViewComponent(GameObject gameObject,Position position,int deep) {
+        super(gameObject);
+        this.deep=deep;
+        this.position=position;
     }
 
     @Override
