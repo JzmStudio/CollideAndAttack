@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.example.collideandattack.R;
 
+import Bases.Point;
 import Bases.Position;
 import Components.UpdateComponent;
 import Components.ViewComponents.BitmapView;
@@ -19,7 +20,11 @@ public class StartTriangle extends UpdateComponent {
     Bitmap[] bitmaps=new Bitmap[15];
     int index;
     BitmapView bitmapView;
+    BitmapView beard;
+    BitmapView eye;
     float delta=0;
+    boolean isover=false,isright=false;
+    Point init;
     public StartTriangle(GameObject gameObject) {
         super(gameObject);
         objPostion=gameObject.getObjectPosition().position;
@@ -28,6 +33,11 @@ public class StartTriangle extends UpdateComponent {
             bitmaps[index]=SystemManager.getStorage().getBitmapFromAssets("anim"+index,"drawable", Bitmap.Config.ARGB_8888);
         }
         bitmapView=(BitmapView)gameObject.getComponent("BitmapView").get(0);
+        beard=new BitmapView(gameObject,R.drawable.beard, Bitmap.Config.ARGB_8888,2);
+        beard.position.point.x=-5;
+        eye=new BitmapView(gameObject,R.drawable.eye, Bitmap.Config.ARGB_8888,2);
+        gameObject.addComponent(beard);
+        gameObject.addComponent(eye);
         index=0;
         EventSystem.newEventListenerList("AnimOver");
     }
@@ -35,25 +45,20 @@ public class StartTriangle extends UpdateComponent {
     @Override
     public void Update(float deltaMillisecond) {
         delta+=deltaMillisecond;
-        if(delta<70f)
+        if(index<=14)
+        {
+            bitmapView.bitmap=bitmaps[index];
+            index++;
             return;
-        else
-            delta=0;
-        bitmapView.bitmap=bitmaps[index];
-        index++;
-        if(index==15)
-        {
-            EventSystem.pushEvent("AnimOver");
-            removeThis();
         }
-        /*if(objPostion.point.x<1200)
-            objPostion.point.x+=deltaMillisecond*4;
-        else
+        if(!isover)
         {
-            objPostion.point.x+=deltaMillisecond*4;
-            objPostion.point.y+=deltaMillisecond*4;
-        }*/
-        //Log.d("Update",""+deltaMillisecond);
+            if(isright)
+            {
+                beard.position.point.x+=deltaMillisecond*0.05;
+                //if(beard.position.point.x)
+            }
+        }
     }
 
     @Override

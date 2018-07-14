@@ -11,7 +11,16 @@ public class GameWorld {
         objects=new ArrayList<>();
     }
 
-    public void addGameObject(GameObject object) {objects.add(object);}
+    /**
+     * 返回加入的GameObject
+     * @param object
+     * @return
+     */
+    public GameObject addGameObject(GameObject object)
+    {
+        objects.add(object);
+        return object;
+    }
     public void removeGameObject(GameObject object) {objects.remove(object);}
 
     public void releaseThisWorld()

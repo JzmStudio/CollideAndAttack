@@ -19,11 +19,13 @@ import Components.ViewComponents.BitmapView;
 import Components.ViewComponents.ClosePointView;
 import Components.ViewComponents.ScreenBitmapView;
 import Components.ViewComponents.ScreenRectView;
+import Components.ViewComponents.ScreenTextView;
 import Components.ViewComponents.TextView;
 import Interfaces.UpdateView;
 
 public class ViewSystem implements UpdateView{
     private Queue<OnDraw> drawQueue;
+    private Queue<OnDraw> copyQueue;
     private AndroidGraphics graphics;
     /**
      * 存储ViewComponent的绘图实例对应表
@@ -48,6 +50,7 @@ public class ViewSystem implements UpdateView{
 
     private Bitmap bitmap=Bitmap.createBitmap(1920,1080, Bitmap.Config.RGB_565);
     private Canvas canvas;  //先绘制到此Canvas上再绘制到手机屏幕
+    /*绘制到屏幕上的范围*/
     private RectF dstRect;
     private int screenWidth;
     private int screenHeight;
@@ -63,6 +66,7 @@ public class ViewSystem implements UpdateView{
                 return onDraw.view.getDeep()-t1.view.getDeep();
             }
         });
+        copyQueue=new PriorityQueue<>(drawQueue);
         graphics=new AndroidGraphics();
         sysDrawCorrelate=new HashMap<>();
         bitmapViews=SystemManager.addComponentList("BitmapView");
@@ -76,58 +80,35 @@ public class ViewSystem implements UpdateView{
         graphics.setCanvasToDraw(canvas);
         screenHeight=SystemManager.getMainActivity().getScreenHeight();
         screenWidth=SystemManager.getMainActivity().getScreenWidth();
-        scaleW=screenWidth/targetScreenWidth;
-        scaleH=screenHeight/targetScreenHeight;
+        scaleW=targetScreenHeight/screenWidth;
+        scaleH=targetScreenHeight/screenHeight;
         dstRect=new RectF();
-        if(scaleW>scaleH){
+        if(scaleW<scaleH){  //屏幕更宽
             dstRect.left=(screenWidth-targetScreenWidth*scaleH)/2.0f;
             dstRect.right=(screenWidth+targetScreenWidth*scaleH)/2.0f;
             dstRect.top=0;
             dstRect.bottom=screenHeight;
+            scaleH=1f;
+            scaleW=dstRect.width()/screenWidth;
         }
-        else {
+        else {  //屏幕更长
             dstRect.left=0;
             dstRect.right=screenWidth;
             dstRect.top=(screenHeight-targetScreenHeight*scaleW)/2.0f;
             dstRect.bottom=(screenHeight+targetScreenHeight*scaleW)/2.0f;
+            scaleW=1;
+            scaleH=(dstRect.height()<0?-dstRect.height():dstRect.height())/screenHeight;
         }
-        //Cemera
+        /*Cemera*/
         cemeraPosition=new Position();
 
         SystemManager.getMainActivity().getUpdateView().addToUpdateViewList(this);
     }
 
-    /*public void addViewComponent(ViewComponent viewComponent)
-    {
-        Log.d("addView",viewComponent.getClass().getSimpleName());
-        OnDraw draw=null;
-        if(viewComponent instanceof BitmapView)
-        {
-            draw=new BitmapDraw(viewComponent);
-        }
-        else if(viewComponent instanceof ClosePointView)
-        {
-            draw=new ClosePointDraw(viewComponent);
-        }
-        else if(viewComponent instanceof TextView)
-        {
-            draw=new TextDraw(viewComponent);
-        }
-        else if(viewComponent instanceof ScreenBitmapView)
-        {
-            draw=new ScreenBitmapDraw(viewComponent);
-        }
-        else {
-            return;
-        }
-        drawQueue.add(draw);    //加入绘图优先队列
-        initList.add(draw);     //加入初始化队列
-        sysDrawCorrelate.put(viewComponent,draw);
-    }*/
-
     public void addViewComponent(BitmapView bitmapView)
     {
         addToDraw(new BitmapDraw(bitmapView));
+        Log.d("AddBitmap",""+drawQueue.size());
     }
 
     public void addViewComponent(ClosePointView closePointView)
@@ -148,6 +129,11 @@ public class ViewSystem implements UpdateView{
     public void addViewComponent(TextView textView)
     {
         addToDraw(new TextDraw(textView));
+    }
+
+    public void addViewComponent(ScreenTextView screenTextView)
+    {
+        addToDraw(new ScreenTextDraw(screenTextView));
     }
 
     private void addToDraw(OnDraw draw)
@@ -172,16 +158,33 @@ public class ViewSystem implements UpdateView{
 //            initList.remove(i).init();
 //        }
         /*绘图*/
-        for(OnDraw com:drawQueue)
+        graphics.clearCanvas();
+//        for(OnDraw com:drawQueue)
+//        {
+//            com.onDraw();
+//        }
+        Queue queue;
+        OnDraw com;
+        int i=0;
+        while((com=drawQueue.poll())!=null)
         {
             com.onDraw();
+            copyQueue.add(com);
+            //Log.d("DrawOver",""+i);i++;
         }
+        queue=drawQueue;
+        drawQueue=copyQueue;
+        copyQueue=queue;
+        copyQueue.clear();
+        //Log.d("ViewDraw",""+drawQueue.size());
         updateCanvas.drawBitmap(bitmap,null,dstRect,null);
     }
 
     public void removeViewComponent(ViewComponent viewComponent)
     {
+        Log.d("ViewRemove",viewComponent.getClass().getSimpleName());
         drawQueue.remove(sysDrawCorrelate.remove(viewComponent));
+        sysDrawCorrelate.remove(viewComponent);
     }
 
     /**
@@ -206,6 +209,9 @@ public class ViewSystem implements UpdateView{
         dstRect.bottom=screenHeight;
         dstRect.left=0;
         dstRect.right=screenWidth;
+        scaleH=1;
+        scaleW=1;
+        SystemManager.getInputSystem().changeScale(scaleW,scaleH);
     }
 
     /**
@@ -213,18 +219,33 @@ public class ViewSystem implements UpdateView{
      */
     public void changeScaleDraw()
     {
-        if(scaleW>scaleH){
+        scaleW=targetScreenHeight/screenWidth;
+        scaleH=targetScreenHeight/screenHeight;
+        if(scaleW<scaleH){
             dstRect.left=(screenWidth-targetScreenWidth*scaleH)/2.0f;
             dstRect.right=(screenWidth+targetScreenWidth*scaleH)/2.0f;
             dstRect.top=0;
             dstRect.bottom=screenHeight;
+            scaleH=1f;
+            scaleW=dstRect.width()/screenWidth;
         }
         else {
             dstRect.left=0;
             dstRect.right=screenWidth;
             dstRect.top=(screenHeight-targetScreenHeight*scaleW)/2.0f;
             dstRect.bottom=(screenHeight+targetScreenHeight*scaleW)/2.0f;
+            scaleW=1;
+            scaleH=(dstRect.height()<0?-dstRect.height():dstRect.height())/screenHeight;
         }
+        SystemManager.getInputSystem().changeScale(scaleW,scaleH);
+    }
+
+    public float getScaleW(){
+        return scaleW;
+    }
+
+    public float getScaleH() {
+        return scaleH;
     }
 
     private abstract class OnDraw{
@@ -253,18 +274,25 @@ public class ViewSystem implements UpdateView{
         @Override
         void onDraw() {
             BitmapView b=(BitmapView)view;
-            if(!b.isVisible) return;
+            if(!b.draw) return;
             Transform localCoordinate=view.getGameObject().getObjectPosition();
-            //Log.d("Local",""+view.position.point.x+" "+view.position.point.y);
-            //Log.d("Draw",name);
             Position.transferToGlobal(localCoordinate.position,b.position.point,globalPoint);
-            //Log.d("Global",""+globalPoint.x+" "+globalPoint.y);
             Position.transferToLocal(cemeraPosition,globalPoint,cemeraPoint);
-            //Log.d("Cem",""+cemeraPoint.x+" "+cemeraPoint.y);
-            //Log.d("LLL",""+left+" "+right+" "+bottom+" "+top+" "+cemeraPoint.x+" "+cemeraPoint.y);
+            //有缩放
+            float scaleX=b.scaleX;
+            float scaleY=b.scaleY;
+            if(scaleY!=1||scaleX!=1)
+            {
+                float w=b.bitmap.getWidth()*scaleX;
+                float h=b.bitmap.getHeight()*scaleY;
+                //Log.d("Draw",""+w+" "+h+" "+scaleY+" "+scaleX);
+                len=(float) Math.sqrt(w*w+h*h);
+                if(cemeraPoint.x+len<left||cemeraPoint.x-len>right||cemeraPoint.y+len<bottom||cemeraPoint.y-len>top) return;
+                graphics.drawBitmap(b.bitmap,scaleX,scaleY,halfTargetWidth+cemeraPoint.x,halfTargetHeight-cemeraPoint.y,cemeraPosition.degree-b.position.degree-localCoordinate.position.degree,b.alpha);
+                return;
+            }
             if(cemeraPoint.x+len<left||cemeraPoint.x-len>right||cemeraPoint.y+len<bottom||cemeraPoint.y-len>top) return;
-            graphics.drawBitmap(b.bitmap,halfTargetWidth+cemeraPoint.x,halfTargetHeight-cemeraPoint.y,cemeraPosition.degree-b.position.degree-localCoordinate.position.degree);
-            //Log.d("Location",""+(halfTargetWidth+cemeraPoint.x)+(halfTargetHeight-cemeraPoint.y));
+            graphics.drawBitmap(b.bitmap,halfTargetWidth+cemeraPoint.x,halfTargetHeight-cemeraPoint.y,cemeraPosition.degree-b.position.degree-localCoordinate.position.degree,b.alpha);
         }
     }
 
@@ -299,25 +327,24 @@ public class ViewSystem implements UpdateView{
         @Override
         void onDraw() {
             TextView t= (TextView) view;
+            if(!t.draw) return;
             Position localCoordinate=t.getGameObject().getObjectPosition().position;
             Position.transferToGlobal(localCoordinate,t.position.point,globalPoint);
             Position.transferToLocal(cemeraPosition,globalPoint,cemeraPoint);
-            graphics.drawText(t.text,cemeraPoint.x,cemeraPoint.y,t.size,t.color,t.alpha, cemeraPosition.degree-t.position.degree-localCoordinate.degree);
+            graphics.drawText(t.text,cemeraPoint.x,cemeraPoint.y,t.size,t.color, t.width,cemeraPosition.degree-t.position.degree-localCoordinate.degree);
         }
     }
 
     private class ScreenBitmapDraw extends OnDraw{
-        String name;
         ScreenBitmapDraw(ViewComponent viewComponent) {
             super(viewComponent);
-            name=viewComponent.getClass().getSimpleName();
         }
 
         @Override
         void onDraw() {
-            Log.d("Draw",name);
             ScreenBitmapView b= (ScreenBitmapView) view;
-            graphics.drawBitmap(b.bitmap,b.position.point.x,b.position.point.y,-b.position.degree);
+            if(!b.draw) return;
+            graphics.drawBitmap(b.bitmap,b.position.point.x,b.position.point.y,-b.position.degree,b.alpha);
         }
     }
 
@@ -329,10 +356,24 @@ public class ViewSystem implements UpdateView{
         @Override
         void onDraw() {
             ScreenRectView v= (ScreenRectView) view;
+            if(!v.draw) return;
             if(v.isFill)
                 graphics.fillRoundRect(v.position.point.x,v.position.point.y,v.width,v.height,v.radius,v.color,-v.position.degree);
             else
                 graphics.drawRoundRect(v.position.point.x,v.position.point.y,v.width,v.height,v.strockWidth,v.radius,v.color,-v.position.degree);
+        }
+    }
+
+    private class ScreenTextDraw extends OnDraw{
+        ScreenTextDraw(ViewComponent viewComponent) {
+            super(viewComponent);
+        }
+
+        @Override
+        void onDraw() {
+            ScreenTextView v=(ScreenTextView) view;
+            if(!v.draw) return;
+            graphics.drawText(v.text,v.position.point.x,v.position.point.y,v.size,v.color,v.width,-v.position.degree);
         }
     }
 }

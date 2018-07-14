@@ -3,6 +3,7 @@ package Android;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -53,33 +54,50 @@ public class AndroidUpdateView extends SurfaceView implements Runnable{
     public void run() {
         long startTime = System.currentTimeMillis();
         long deltaTime;
+        //int i=0,j=0;
         while(isRun)
         {
-            if(!holder.getSurface().isValid()) continue;
+            if(!holder.getSurface().isValid()) {/*Log.d("UpdateFFF",""+j);
+                j++;*/
+//                try {
+//                    Thread.sleep(100);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+                continue; }
             deltaTime = System.currentTimeMillis()-startTime;
             if(deltaTime<updateInMillis)
             {
                 try {
                     Thread.sleep(updateInMillis-deltaTime);
+                    //Log.d("Sleep",""+(updateInMillis-deltaTime));
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
 
+            //Log.d("Update",""+i);
+            //i++;
             /*更新游戏逻辑*/
             for(CanUpdate o:updateList) {
+                //Log.d("UC",""+updateList.size());
                 o.update(System.currentTimeMillis() - startTime);
+                //Log.d("UCOver",""+updateList.size());
             }
 
             /*更新游戏视图*/
             canvas=holder.lockCanvas();
+            //canvas.drawColor(0xF10000FF);
             for(UpdateView u:updateViewList){
+                //Log.d("UV",""+updateViewList.size());
                 u.updateView(canvas);
+                //Log.d("UVOver",""+updateViewList.size());
             }
             holder.unlockCanvasAndPost(canvas);
 
             startTime=System.currentTimeMillis();
         }
+        //Log.e("Update","Stop!");
     }
 
     public void pause()
@@ -126,8 +144,7 @@ public class AndroidUpdateView extends SurfaceView implements Runnable{
         startListeners.add(o);
     }
 
-    public void removeFromStartList(Start o)
-    {
+    public void removeFromStartList(Start o) {
         startListeners.remove(o);
     }
 }

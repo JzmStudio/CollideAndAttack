@@ -1,6 +1,7 @@
 package Components.ViewComponents;
 
 import android.graphics.Bitmap;
+import android.graphics.RectF;
 import android.util.Log;
 
 import Bases.Position;
@@ -14,7 +15,12 @@ import Systems.SystemManager;
 public class BitmapView extends ViewComponent{
     public Bitmap bitmap;
     private int bitmapId;
-    public boolean isVisible=true;
+    //public boolean isVisible=true;
+    /**
+     * scaleX=放缩后的长度/原长度
+     */
+    public float scaleX=1;
+    public float scaleY=1;
 
     public BitmapView(GameObject gameObject, int bitmapId, Bitmap.Config config)
     {
@@ -46,5 +52,6 @@ public class BitmapView extends ViewComponent{
         this.bitmapId=bitmapId;
         bitmap= SystemManager.getStorage().getBitmapFromAssets(bitmapId,config);
         SystemManager.getViewSystem().addViewComponent(this);
+        //Log.e("NewBitmap","N1");
     }
 }

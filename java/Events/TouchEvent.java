@@ -9,12 +9,15 @@ public class TouchEvent extends Event{
 	public static final int Touch_Move=3;
 	
 	public int type=-1;
-	public Point position;
+	public Point point;
+	/**
+	 * ID>0为有效值
+	 */
 	public int ID=-1;
 	
-	public TouchEvent(String name)
+	public TouchEvent()
 	{
-		super(name);
-		position=new Point();
+		super("AndroidTouch");
+		point=new Point();
 	}
 }

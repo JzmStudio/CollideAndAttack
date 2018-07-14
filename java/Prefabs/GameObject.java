@@ -58,7 +58,7 @@ public class GameObject {
 
 	public void addComponent(Component component)
 	{
-		Log.d("AddGamCom",component.getClass().getSimpleName());
+		//Log.d("AddGamCom",component.getClass().getSimpleName());
 		if(!components.containsKey(component.getClass().getSimpleName()))
         {
         	ArrayList<Component> arrayList=new ArrayList<>();

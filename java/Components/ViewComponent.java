@@ -22,9 +22,12 @@ public class ViewComponent extends Component {
     public boolean draw=true;
 
     /**
-     * 此处由于只定义
+     * 本地坐标系相对于全局坐标系的位置,逆时针为+
      */
-    public Position position;   //本地坐标系相对于全局坐标系的角度,逆时针为+
+    public Position position;
+
+    /*显示的透明度*/
+    public int alpha=255;
 
     /**
      * 默认deep=0

@@ -5,6 +5,7 @@ import android.graphics.*;
 import java.util.ArrayList;
 
 import Bases.Point;
+import Systems.SystemManager;
 
 /**
  * 此类里面所有角度顺时针为+
@@ -13,33 +14,39 @@ public class AndroidGraphics {
     private Canvas drawCanvas;
     private Paint paint;
     private Path path;
-    private final RectF rectToDrawBitmap;   //仅用于画Bitmap
     private RectF rectF;
+    private Typeface typeface;
+
+    private Paint bitmapPaint;  //用于画Bitmap
 
     public AndroidGraphics()
     {
-        rectToDrawBitmap=new RectF();
-        rectToDrawBitmap.left=0;
-        rectToDrawBitmap.top=0;
         rectF=new RectF();
         paint=new Paint();
+        bitmapPaint=new Paint();
         path=new Path();
+        typeface=Typeface.createFromAsset(SystemManager.getMainActivity().getAssets(),"font.ttf");
+        paint.setTypeface(typeface);
     }
 
     public AndroidGraphics(Canvas canvas)
     {
         drawCanvas=canvas;
-        rectToDrawBitmap=new RectF();
-        rectToDrawBitmap.left=0;
-        rectToDrawBitmap.top=0;
         rectF=new RectF();
         paint=new Paint();
         path=new Path();
+        typeface=Typeface.createFromAsset(SystemManager.getMainActivity().getAssets(),"font.ttf");
+        paint.setTypeface(typeface);
     }
 
     public void setCanvasToDraw(Canvas canvas)
     {
         this.drawCanvas=canvas;
+    }
+
+    public void changeTypeface(Typeface typeface)
+    {
+        paint.setTypeface(typeface);
     }
 
     public void drawBackgroundColor(int color)
@@ -307,12 +314,27 @@ public class AndroidGraphics {
      * @param y top
      * @param degree
      */
-    public void drawBitmap(Bitmap bitmap,float x,float y,float degree)
+    public void drawBitmap(Bitmap bitmap,float x,float y,float degree,int alpha)
     {
+        bitmapPaint.setAlpha(alpha);
         drawCanvas.save();
         drawCanvas.translate(x,y);
         drawCanvas.rotate(degree);
-        drawCanvas.drawBitmap(bitmap,0,0,null);
+        drawCanvas.drawBitmap(bitmap,0,0,bitmapPaint);
+        drawCanvas.restore();
+    }
+
+    public void drawBitmap(Bitmap bitmap,float scaleW,float scaleH,float x,float y,float degree,int alpha)
+    {
+        bitmapPaint.setAlpha(alpha);
+        drawCanvas.save();
+        drawCanvas.translate(x,y);
+        drawCanvas.rotate(degree);
+        rectF.top=0;
+        rectF.left=0;
+        rectF.bottom=bitmap.getHeight()*scaleW;
+        rectF.right=bitmap.getWidth()*scaleH;
+        drawCanvas.drawBitmap(bitmap,null,rectF,bitmapPaint);
         drawCanvas.restore();
     }
 
@@ -381,20 +403,23 @@ public class AndroidGraphics {
      * @param y 基线的位置
      * @param size
      * @param color
-     * @param alpha
      * @param degree
      */
-    public void drawText(String s,float x,float y,float size,int color,int alpha,float degree)
+    public void drawText(String s,float x,float y,float size,int color,int width,float degree)
     {
         drawCanvas.save();
         drawCanvas.translate(x,y);
         drawCanvas.rotate(degree);
         paint.setTextSize(size);
         paint.setColor(color);
-        paint.setStrokeWidth(3);
+        paint.setStrokeWidth(width);
         paint.setTextAlign(Paint.Align.CENTER);
-        paint.setAlpha(alpha);
         drawCanvas.drawText(s, 0, 0, paint);
         drawCanvas.restore();
+    }
+
+    public void clearCanvas()
+    {
+        drawCanvas.drawColor(Color.TRANSPARENT,PorterDuff.Mode.CLEAR);
     }
 }

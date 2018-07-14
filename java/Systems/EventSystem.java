@@ -6,6 +6,9 @@ import java.util.HashMap;
 import Events.Event;
 import Interfaces.EventAction;
 
+/**
+ * 使用顺序：newEventListenerList->registerToEventList/pushEvent->removeEventListenerList
+ */
 public class EventSystem {
 	
 	private static final HashMap<String, ArrayList<EventAction>> hash=new HashMap<String, ArrayList<EventAction>>();

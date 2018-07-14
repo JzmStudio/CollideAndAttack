@@ -7,6 +7,7 @@ import java.util.HashMap;
 
 import Android.AndroidMain;
 import Android.AndroidStorage;
+import Android.AndroidTouchListener;
 import Components.Component;
 import Components.UpdateComponent;
 import World.GameWorld;
@@ -21,6 +22,7 @@ public class SystemManager {
     private static ScriptSystem scriptSystem;
     private static AndroidStorage storage;
     private static ViewSystem viewSystem;
+    private static AndroidTouchListener inputSystem;
 
     private static HashMap<String,ArrayList<Component>> components;
 
@@ -36,6 +38,7 @@ public class SystemManager {
         scriptSystem=new ScriptSystem();
         storage=main.getStorage();
         viewSystem=new ViewSystem();
+        inputSystem=new AndroidTouchListener(3,viewSystem.getScaleW(),viewSystem.getScaleH());
 
         /*游戏场景初始化*/
         setGameWorld(new StartGameWorld()); //-------------定义所有场景都从StartGameWorld类开始-------------
@@ -55,8 +58,22 @@ public class SystemManager {
 
     public static GameWorld getCurrentGameWorld() {return gameWorld;}
 
+    /**
+     * 不自动调用原GameWorld的releaseThisGameWOrld()
+     * @param world
+     */
     public static void setGameWorld(GameWorld world)
     {
+        gameWorld=world;
+    }
+
+    /**
+     * 自动调用原GameWorld的releaseThisGameWOrld()
+     * @param world
+     */
+    public static void changeGameWorld(GameWorld world)
+    {
+        gameWorld.releaseThisWorld();
         gameWorld=world;
     }
 
@@ -122,5 +139,9 @@ public class SystemManager {
 
     public static AndroidMain getMainActivity(){
         return main;
+    }
+
+    public static AndroidTouchListener getInputSystem(){
+        return inputSystem;
     }
 }
