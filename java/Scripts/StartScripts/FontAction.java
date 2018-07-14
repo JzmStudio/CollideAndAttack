@@ -1,5 +1,9 @@
 package Scripts.StartScripts;
 
+import android.util.Log;
+
+import java.util.ArrayList;
+
 import Components.UpdateComponent;
 import Components.ViewComponents.ScreenTextView;
 import Components.ViewComponents.TextView;
@@ -9,6 +13,8 @@ import Interfaces.EventAction;
 import Interfaces.Screen;
 import Prefabs.GameObject;
 import Systems.EventSystem;
+import Systems.SystemManager;
+import World.Start;
 
 public class FontAction extends UpdateComponent implements EventAction {
 
@@ -25,6 +31,12 @@ public class FontAction extends UpdateComponent implements EventAction {
         if(start)
         {
             screenTextView.draw=true;
+            ArrayList arrayList=SystemManager.getInputSystem().getTouchList();
+            if(arrayList.size()!=0)
+            {
+                Log.d("Touch",""+arrayList.size());
+                SystemManager.changeGameWorld(new Start());
+            }
         }
     }
 

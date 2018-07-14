@@ -58,7 +58,7 @@ public class EyeAction extends UpdateComponent implements EventAction{
         }
         if(canStart3)
         {
-            eyeBitmap.alpha= (int) (eyeBitmap.alpha-0.2f*eyeBitmap.alpha);
+            eyeBitmap.alpha= (int) (eyeBitmap.alpha-0.1f*eyeBitmap.alpha);
             if(eyeBitmap.alpha<0)
             {
                 eyeBitmap.alpha=0;

@@ -22,7 +22,7 @@ public class ViewComponent extends Component {
     public boolean draw=true;
 
     /**
-     * 本地坐标系相对于全局坐标系的位置,逆时针为+
+     * 某些绘图组件使用,表示其位置,逆时针为+
      */
     public Position position;
 

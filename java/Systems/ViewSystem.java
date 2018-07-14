@@ -18,6 +18,7 @@ import Components.ViewComponent;
 import Components.ViewComponents.BitmapView;
 import Components.ViewComponents.ClosePointView;
 import Components.ViewComponents.ScreenBitmapView;
+import Components.ViewComponents.ScreenCircleView;
 import Components.ViewComponents.ScreenRectView;
 import Components.ViewComponents.ScreenTextView;
 import Components.ViewComponents.TextView;
@@ -105,24 +106,20 @@ public class ViewSystem implements UpdateView{
         SystemManager.getMainActivity().getUpdateView().addToUpdateViewList(this);
     }
 
-    public void addViewComponent(BitmapView bitmapView)
-    {
+    public void addViewComponent(BitmapView bitmapView) {
         addToDraw(new BitmapDraw(bitmapView));
         Log.d("AddBitmap",""+drawQueue.size());
     }
 
-    public void addViewComponent(ClosePointView closePointView)
-    {
+    public void addViewComponent(ClosePointView closePointView) {
         addToDraw(new ClosePointDraw(closePointView));
     }
 
-    public void addViewComponent(ScreenBitmapView screenBitmapView)
-    {
+    public void addViewComponent(ScreenBitmapView screenBitmapView) {
         addToDraw(new ScreenBitmapDraw(screenBitmapView));
     }
 
-    public void addViewComponent(ScreenRectView screenRectView)
-    {
+    public void addViewComponent(ScreenRectView screenRectView) {
         addToDraw(new ScreenRectDraw(screenRectView));
     }
 
@@ -131,9 +128,12 @@ public class ViewSystem implements UpdateView{
         addToDraw(new TextDraw(textView));
     }
 
-    public void addViewComponent(ScreenTextView screenTextView)
-    {
+    public void addViewComponent(ScreenTextView screenTextView) {
         addToDraw(new ScreenTextDraw(screenTextView));
+    }
+
+    public void addViewComponent(ScreenCircleView screenCircleView) {
+        addToDraw(new ScreenCircleDraw(screenCircleView));
     }
 
     private void addToDraw(OnDraw draw)
@@ -374,6 +374,21 @@ public class ViewSystem implements UpdateView{
             ScreenTextView v=(ScreenTextView) view;
             if(!v.draw) return;
             graphics.drawText(v.text,v.position.point.x,v.position.point.y,v.size,v.color,v.width,-v.position.degree);
+        }
+    }
+
+    private class ScreenCircleDraw extends OnDraw {
+        ScreenCircleDraw(ViewComponent viewComponent) {
+            super(viewComponent);
+        }
+
+        @Override
+        void onDraw() {
+            ScreenCircleView v= (ScreenCircleView) view;
+            if(v.isFill)
+                graphics.fillCircle(v.color,v.position.point.x,v.position.point.y,v.radius);
+            else
+                graphics.drawCircle(v.color,v.position.point.x,v.position.point.y,v.radius,10);
         }
     }
 }

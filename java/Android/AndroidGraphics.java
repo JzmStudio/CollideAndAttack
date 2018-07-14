@@ -413,7 +413,7 @@ public class AndroidGraphics {
         paint.setTextSize(size);
         paint.setColor(color);
         paint.setStrokeWidth(width);
-        paint.setTextAlign(Paint.Align.CENTER);
+        paint.setTextAlign(Paint.Align.LEFT);
         drawCanvas.drawText(s, 0, 0, paint);
         drawCanvas.restore();
     }

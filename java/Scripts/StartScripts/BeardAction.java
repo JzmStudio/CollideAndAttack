@@ -15,7 +15,7 @@ public class BeardAction extends UpdateComponent implements EventAction {
     private boolean front=true;
     private float startx;
     private float dis=20;
-    private float delta=200; //动画播放时间
+    private float delta=120; //动画播放时间
     private float per;
 
     private float sum;  //预加载等待时间
