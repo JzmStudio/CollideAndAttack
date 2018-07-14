@@ -18,6 +18,7 @@ public class Start extends GameWorld {
         Log.d("GW","changed");
         bg=addGameObject(new GameObject());
         bg.addComponent(new ScreenBitmapView(bg, R.drawable.bg, Bitmap.Config.ARGB_8888,0,0,0));
+
         start=addGameObject(new GameObject());
         start.addComponent(new ScreenTextView(start,"开始游戏",900,600,0, Color.BLACK,100,1));
     }
