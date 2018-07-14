@@ -1,12 +1,8 @@
 package Systems;
 
 import java.util.ArrayList;
-import java.util.Queue;
-
-import Android.AndroidUpdateView;
 import Components.UpdateComponent;
 import Interfaces.CanUpdate;
-import Interfaces.Start;
 
 public class ScriptSystem implements CanUpdate{
 	private ArrayList<UpdateComponent> list;
